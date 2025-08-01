@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import QACatalog from '../components/QACatalog.vue';
+---
+
+<Layout title="Q&A Catalog - AEM Ace">
+  <div class="py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h1 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+          Q&A Catalog
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Browse and study individual Q&A pairs from the AEM Site Developer exam. 
+          Each question includes detailed explanations to help you understand the concepts.
+        </p>
+      </div>
+      
+      <QACatalog client:load />
+    </div>
+  </div>
+</Layout>

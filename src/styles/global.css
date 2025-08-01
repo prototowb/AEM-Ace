@@ -1,0 +1,51 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body text-gray-900 bg-background;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors duration-200;
+  }
+  
+  .quiz-option {
+    @apply bg-white border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-accent transition-all duration-200;
+  }
+  
+  .quiz-option.selected {
+    @apply border-accent bg-accent/5;
+  }
+  
+  .quiz-option.correct {
+    @apply border-green-500 bg-green-50;
+  }
+  
+  .quiz-option.incorrect {
+    @apply border-red-500 bg-red-50;
+  }
+}
