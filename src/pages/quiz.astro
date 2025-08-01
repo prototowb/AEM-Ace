@@ -5,10 +5,13 @@ import { sanityClient } from "sanity:client";
 import { queries } from '../lib/sanity';
 
 // Fetch questions and categories from Sanity
-const [questions, categories] = await Promise.all([
+const [questionsRaw, categories] = await Promise.all([
   sanityClient.fetch(queries.allQuestions),
   sanityClient.fetch(queries.allCategories)
 ]);
+
+// Fetch questions and categories from Sanity
+const questions = questionsRaw;
 ---
 
 <Layout title="Interactive Quiz - AEM Ace">

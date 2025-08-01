@@ -14,11 +14,17 @@ export interface Question {
   title: string;
   question: string;
   options: string[];
-  correctAnswer: number;
+  correctAnswers: number[];
+  isMultipleChoice?: boolean;
   explanation?: string;
   category: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    _type: 'category';
+    name: string;
+    slug: {
+      current: string;
+    };
+    color?: string;
   };
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   tags?: string[];
@@ -34,6 +40,7 @@ export interface Category {
   description?: string;
   icon?: string;
   color?: string;
+  questionCount?: number;
 }
 
 export interface BlogPost {
@@ -59,7 +66,8 @@ export const queries = {
     title,
     question,
     options,
-    correctAnswer,
+    correctAnswers,
+    isMultipleChoice,
     explanation,
     category->{
       _id,
@@ -76,7 +84,8 @@ export const queries = {
     title,
     question,
     options,
-    correctAnswer,
+    correctAnswers,
+    isMultipleChoice,
     explanation,
     difficulty,
     tags
@@ -101,3 +110,4 @@ export const queries = {
     author
   }`
 };
+

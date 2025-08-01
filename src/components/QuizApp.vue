@@ -22,7 +22,7 @@
               :key="category._id" 
               :value="category._id"
             >
-              {{ category.name }} ({{ category.questionCount }} questions)
+              {{ category.name }} ({{ category.questionCount || 0 }} questions)
             </option>
           </select>
         </div>
@@ -88,23 +88,37 @@
 
       <!-- Current Question -->
       <div class="card">
-        <div class="mb-6">
+                  <div class="mb-6">
           <div class="flex justify-between items-start mb-4">
             <h2 class="text-xl font-heading font-semibold text-gray-900">
               {{ currentQuestion.title }}
+              <span v-if="currentQuestion.isMultipleChoice" class="ml-2 text-sm text-blue-600 font-normal">
+                (Select Multiple)
+              </span>
             </h2>
-            <span
-              :class="[
-                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                currentQuestion.difficulty === 'beginner' ? 'bg-green-100 text-green-800' :
-                currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              ]"
-            >
-              {{ currentQuestion.difficulty }}
-            </span>
+            <div class="flex gap-2">
+              <span
+                v-if="currentQuestion.isMultipleChoice"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {{ currentQuestion.correctAnswers.length }} correct
+              </span>
+              <span
+                :class="[
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  currentQuestion.difficulty === 'beginner' ? 'bg-green-100 text-green-800' :
+                  currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-red-100 text-red-800'
+                ]"
+              >
+                {{ currentQuestion.difficulty }}
+              </span>
+            </div>
           </div>
           <p class="text-gray-700 text-lg">{{ currentQuestion.question }}</p>
+          <p v-if="currentQuestion.isMultipleChoice" class="text-sm text-blue-600 mt-2">
+            💡 This question has multiple correct answers. Select all that apply.
+          </p>
         </div>
 
         <!-- Answer Options -->
@@ -112,29 +126,53 @@
           <button
             v-for="(option, index) in currentQuestion.options"
             :key="index"
-            @click="selectAnswer(index)"
-            :disabled="selectedAnswer !== null"
-            :class="[
+            @click="toggleAnswer(index)"
+            :disabled="isAnswered"
+                          :class="[
               'quiz-option w-full text-left',
-              selectedAnswer === index ? 'selected' : '',
-              selectedAnswer !== null && index === currentQuestion.correctAnswer ? 'correct' : '',
-              selectedAnswer !== null && selectedAnswer === index && index !== currentQuestion.correctAnswer ? 'incorrect' : ''
+              selectedAnswers.includes(index) ? 'selected' : '',
+              isAnswered && currentQuestion.correctAnswers.includes(index) ? 'correct' : '',
+              isAnswered && selectedAnswers.includes(index) && !currentQuestion.correctAnswers.includes(index) ? 'incorrect' : ''
             ]"
           >
-            <span class="font-medium">{{ String.fromCharCode(65 + index) }}.</span>
-            {{ option }}
-            
-            <!-- Result Icons -->
-            <span v-if="selectedAnswer !== null" class="float-right">
-              <span v-if="index === currentQuestion.correctAnswer" class="text-green-600">✓</span>
-              <span v-else-if="selectedAnswer === index" class="text-red-600">✗</span>
-            </span>
+            <div class="flex items-center">
+              <!-- Checkbox/Radio indicator -->
+              <div class="mr-3 flex-shrink-0">
+                <div v-if="currentQuestion.isMultipleChoice" 
+                     :class="[
+                       'w-4 h-4 border-2 rounded flex items-center justify-center',
+                       selectedAnswers.includes(index) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                     ]">
+                  <svg v-if="selectedAnswers.includes(index)" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <div v-else
+                     :class="[
+                       'w-4 h-4 border-2 rounded-full flex items-center justify-center',
+                       selectedAnswers.includes(index) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                     ]">
+                  <div v-if="selectedAnswers.includes(index)" class="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+              </div>
+              
+              <div class="flex-1">
+                <span class="font-medium">{{ String.fromCharCode(65 + index) }}.</span>
+                {{ option }}
+              </div>
+              
+              <!-- Result Icons -->
+              <span v-if="isAnswered" class="ml-3">
+                <span v-if="currentQuestion.correctAnswers.includes(index)" class="text-green-600">✓</span>
+                <span v-else-if="selectedAnswers.includes(index)" class="text-red-600">✗</span>
+              </span>
+            </div>
           </button>
         </div>
 
         <!-- Explanation -->
         <div 
-          v-if="selectedAnswer !== null && currentQuestion.explanation" 
+          v-if="isAnswered && currentQuestion.explanation" 
           class="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6"
         >
           <h4 class="font-medium text-blue-900 mb-2">Explanation:</h4>
@@ -152,7 +190,14 @@
           </button>
           <div></div>
           <button
-            v-if="selectedAnswer !== null"
+            v-if="!isAnswered && selectedAnswers.length > 0"
+            @click="submitAnswer"
+            class="btn-primary mr-4"
+          >
+            Submit Answer
+          </button>
+          <button
+            v-if="isAnswered"
             @click="nextQuestion"
             class="btn-primary"
           >
@@ -254,8 +299,8 @@ const props = defineProps<Props>();
 const isQuizStarted = ref(false);
 const isQuizComplete = ref(false);
 const currentQuestionIndex = ref(0);
-const selectedAnswer = ref<number | null>(null);
-const userAnswers = ref<number[]>([]);
+const selectedAnswers = ref<number[]>([]);
+const userAnswers = ref<number[][]>([]);
 const startTime = ref<number>(0);
 const questionTimes = ref<number[]>([]);
 
@@ -272,10 +317,19 @@ const loading = ref(false);
 
 // Computed properties
 const currentQuestion = computed(() => quizQuestions.value[currentQuestionIndex.value]);
+const isAnswered = computed(() => selectedAnswers.value.length > 0 && hasSubmittedAnswer.value);
+const hasSubmittedAnswer = ref(false);
 const correctAnswers = computed(() => 
-  userAnswers.value.filter((answer, index) => 
-    answer === quizQuestions.value[index]?.correctAnswer
-  ).length
+  userAnswers.value.filter((userAnswer, index) => {
+    const question = quizQuestions.value[index];
+    if (!question) return false;
+    
+    // Check if user selected exactly the correct answers
+    const correctSet = new Set(question.correctAnswers);
+    const userSet = new Set(userAnswer);
+    
+    return correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x));
+  }).length
 );
 const incorrectAnswers = computed(() => quizQuestions.value.length - correctAnswers.value);
 const scorePercentage = computed(() => (correctAnswers.value / quizQuestions.value.length) * 100);
@@ -312,20 +366,38 @@ const startQuiz = async () => {
   
   // Reset quiz state
   currentQuestionIndex.value = 0;
-  selectedAnswer.value = null;
+  selectedAnswers.value = [];
   userAnswers.value = [];
   questionTimes.value = [];
+  hasSubmittedAnswer.value = false;
   isQuizStarted.value = true;
   startTime.value = Date.now();
   
   loading.value = false;
 };
 
-const selectAnswer = (answerIndex: number) => {
-  if (selectedAnswer.value !== null) return;
+const toggleAnswer = (answerIndex: number) => {
+  if (isAnswered.value) return;
   
-  selectedAnswer.value = answerIndex;
-  userAnswers.value[currentQuestionIndex.value] = answerIndex;
+  if (currentQuestion.value.isMultipleChoice) {
+    // Multiple choice: toggle selection
+    const index = selectedAnswers.value.indexOf(answerIndex);
+    if (index > -1) {
+      selectedAnswers.value.splice(index, 1);
+    } else {
+      selectedAnswers.value.push(answerIndex);
+    }
+  } else {
+    // Single choice: replace selection
+    selectedAnswers.value = [answerIndex];
+  }
+};
+
+const submitAnswer = () => {
+  if (selectedAnswers.value.length === 0) return;
+  
+  hasSubmittedAnswer.value = true;
+  userAnswers.value[currentQuestionIndex.value] = [...selectedAnswers.value];
   
   // Record time taken for this question
   const timeSpent = (Date.now() - startTime.value) / 1000;
@@ -335,7 +407,8 @@ const selectAnswer = (answerIndex: number) => {
 const nextQuestion = () => {
   if (currentQuestionIndex.value < quizQuestions.value.length - 1) {
     currentQuestionIndex.value++;
-    selectedAnswer.value = null;
+    selectedAnswers.value = [];
+    hasSubmittedAnswer.value = false;
     startTime.value = Date.now();
   } else {
     isQuizComplete.value = true;
@@ -345,7 +418,8 @@ const nextQuestion = () => {
 const previousQuestion = () => {
   if (currentQuestionIndex.value > 0) {
     currentQuestionIndex.value--;
-    selectedAnswer.value = userAnswers.value[currentQuestionIndex.value] ?? null;
+    selectedAnswers.value = userAnswers.value[currentQuestionIndex.value] ?? [];
+    hasSubmittedAnswer.value = userAnswers.value[currentQuestionIndex.value] !== undefined;
   }
 };
 
@@ -360,9 +434,10 @@ const resetQuiz = () => {
   isQuizStarted.value = false;
   isQuizComplete.value = false;
   currentQuestionIndex.value = 0;
-  selectedAnswer.value = null;
+  selectedAnswers.value = [];
   userAnswers.value = [];
   questionTimes.value = [];
+  hasSubmittedAnswer.value = false;
   quizQuestions.value = [];
 };
 

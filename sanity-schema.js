@@ -67,11 +67,19 @@ export const questionSchema = {
       validation: Rule => Rule.required().min(2).max(6)
     },
     {
-      name: 'correctAnswer',
-      title: 'Correct Answer Index',
-      type: 'number',
-      description: 'Index of the correct answer (0-based)',
-      validation: Rule => Rule.required().min(0)
+      name: 'correctAnswers',
+      title: 'Correct Answer Indices',
+      type: 'array',
+      of: [{ type: 'number' }],
+      description: 'Indices of the correct answers (0-based). For single answer questions, use one index. For multiple answer questions, use multiple indices.',
+      validation: Rule => Rule.required().min(1)
+    },
+    {
+      name: 'isMultipleChoice',
+      title: 'Multiple Correct Answers',
+      type: 'boolean',
+      description: 'Check if this question has multiple correct answers',
+      initialValue: false
     },
     {
       name: 'explanation',

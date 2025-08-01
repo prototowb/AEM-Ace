@@ -48,4 +48,24 @@
   .quiz-option.incorrect {
     @apply border-red-500 bg-red-50;
   }
+  
+  .quiz-option:disabled {
+    @apply cursor-not-allowed;
+  }
+  
+  .quiz-option:disabled:hover {
+    @apply border-gray-200;
+  }
+  
+  .quiz-option.selected:disabled {
+    @apply border-accent bg-accent/5;
+  }
+  
+  .quiz-option.correct:disabled {
+    @apply border-green-500 bg-green-50;
+  }
+  
+  .quiz-option.incorrect:disabled {
+    @apply border-red-500 bg-red-50;
+  }
 }

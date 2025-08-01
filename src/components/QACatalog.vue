@@ -61,14 +61,25 @@
           <div>
             <h3 class="text-lg font-heading font-semibold text-gray-900 mb-2">
               {{ question.title }}
+              <span v-if="question.isMultipleChoice" class="ml-2 text-sm text-blue-600 font-normal">
+                (Multiple Answers)
+              </span>
             </h3>
-            <span
-              v-if="question.category"
-              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-              :style="{ backgroundColor: question.category.color + '20', color: question.category.color }"
-            >
-              {{ question.category.name }}
-            </span>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-if="question.category"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                :style="{ backgroundColor: question.category.color + '20', color: question.category.color }"
+              >
+                {{ question.category.name }}
+              </span>
+              <span
+                v-if="question.isMultipleChoice"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {{ question.correctAnswers.length }} correct answers
+              </span>
+            </div>
           </div>
           <span
             :class="[
@@ -91,14 +102,14 @@
               :key="index"
               :class="[
                 'p-3 rounded-lg border-2',
-                index === question.correctAnswer
+                question.correctAnswers.includes(index)
                   ? 'border-green-500 bg-green-50 text-green-800'
                   : 'border-gray-200 bg-gray-50'
               ]"
             >
               <span class="font-medium">{{ String.fromCharCode(65 + index) }}.</span>
               {{ option }}
-              <span v-if="index === question.correctAnswer" class="ml-2 text-green-600">✓</span>
+              <span v-if="question.correctAnswers.includes(index)" class="ml-2 text-green-600">✓</span>
             </div>
           </div>
         </div>
