@@ -1,6 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import QACatalog from '../components/QACatalog.vue';
+import { sanityClient } from "sanity:client";
+import { queries } from '../lib/sanity';
+
+// Fetch questions and categories from Sanity
+const [questions, categories] = await Promise.all([
+  sanityClient.fetch(queries.allQuestions),
+  sanityClient.fetch(queries.allCategories)
+]);
 ---
 
 <Layout title="Q&A Catalog - AEM Ace">
@@ -16,7 +24,11 @@ import QACatalog from '../components/QACatalog.vue';
         </p>
       </div>
       
-      <QACatalog client:load />
+      <QACatalog 
+        client:load 
+        questions={questions}
+        categories={categories}
+      />
     </div>
   </div>
 </Layout>

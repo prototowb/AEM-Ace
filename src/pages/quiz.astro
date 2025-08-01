@@ -1,6 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import QuizApp from '../components/QuizApp.vue';
+import { sanityClient } from "sanity:client";
+import { queries } from '../lib/sanity';
+
+// Fetch questions and categories from Sanity
+const [questions, categories] = await Promise.all([
+  sanityClient.fetch(queries.allQuestions),
+  sanityClient.fetch(queries.allCategories)
+]);
 ---
 
 <Layout title="Interactive Quiz - AEM Ace">
@@ -16,7 +24,11 @@ import QuizApp from '../components/QuizApp.vue';
         </p>
       </div>
       
-      <QuizApp client:load />
+      <QuizApp 
+        client:load 
+        questions={questions}
+        categories={categories}
+      />
     </div>
   </div>
 </Layout>

@@ -18,7 +18,7 @@
           >
             <option value="">All Categories (Mixed Quiz)</option>
             <option 
-              v-for="category in categories" 
+              v-for="category in props.categories" 
               :key="category._id" 
               :value="category._id"
             >
@@ -242,6 +242,14 @@
 import { ref, computed } from 'vue';
 import type { Question, Category } from '../lib/sanity';
 
+// Props from parent component
+interface Props {
+  questions: Question[];
+  categories: Category[];
+}
+
+const props = defineProps<Props>();
+
 // Quiz state
 const isQuizStarted = ref(false);
 const isQuizComplete = ref(false);
@@ -257,86 +265,10 @@ const selectedDifficulty = ref('');
 const numberOfQuestions = ref(10);
 
 // Data
-const categories = ref<Category[]>([]);
-const allQuestions = ref<Question[]>([]);
 const quizQuestions = ref<Question[]>([]);
 const loading = ref(false);
 
-// Sample data
-const sampleCategories: Category[] = [
-  {
-    _id: 'cat1',
-    _type: 'category',
-    name: 'Component Development',
-    slug: { current: 'component-development' },
-    questionCount: 8
-  },
-  {
-    _id: 'cat2',
-    _type: 'category',
-    name: 'Sling Framework',
-    slug: { current: 'sling-framework' },
-    questionCount: 6
-  },
-  {
-    _id: 'cat3',
-    _type: 'category',
-    name: 'OSGi Services',
-    slug: { current: 'osgi-services' },
-    questionCount: 5
-  }
-];
-
-const sampleQuestions: Question[] = [
-  {
-    _id: '1',
-    _type: 'question',
-    title: 'Component Development',
-    question: 'What is the recommended way to create a new component in AEM?',
-    options: [
-      'Copy an existing component and modify it',
-      'Use the AEM Component Console', 
-      'Create it manually in CRXDE Lite',
-      'Use Maven archetype for AEM projects'
-    ],
-    correctAnswer: 3,
-    explanation: 'Using Maven archetype ensures proper structure and follows AEM best practices.',
-    category: { _ref: 'cat1', _type: 'reference' },
-    difficulty: 'intermediate'
-  },
-  {
-    _id: '2',
-    _type: 'question', 
-    title: 'Sling Models',
-    question: 'Which annotation is used to inject a resource property in a Sling Model?',
-    options: [
-      '@ValueMapValue',
-      '@ResourcePath',
-      '@ChildResource', 
-      '@SlingObject'
-    ],
-    correctAnswer: 0,
-    explanation: '@ValueMapValue is used to inject properties from the resource\'s ValueMap.',
-    category: { _ref: 'cat2', _type: 'reference' },
-    difficulty: 'beginner'
-  },
-  {
-    _id: '3',
-    _type: 'question',
-    title: 'OSGi Configuration',
-    question: 'How do you configure an OSGi service in AEM?',
-    options: [
-      'Using web.xml',
-      'Using @Component annotation',
-      'Using application.properties',
-      'Using pom.xml'
-    ],
-    correctAnswer: 1,
-    explanation: 'OSGi services are configured using the @Component annotation in AEM.',
-    category: { _ref: 'cat3', _type: 'reference' },
-    difficulty: 'intermediate'
-  }
-];
+// No sample data needed - using props
 
 // Computed properties
 const currentQuestion = computed(() => quizQuestions.value[currentQuestionIndex.value]);
@@ -357,17 +289,11 @@ const averageTime = computed(() =>
 const startQuiz = async () => {
   loading.value = true;
   
-  // TODO: Replace with actual Sanity API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  allQuestions.value = sampleQuestions;
-  categories.value = sampleCategories;
-  
   // Filter questions based on settings
-  let filteredQuestions = [...allQuestions.value];
+  let filteredQuestions = [...props.questions];
   
   if (selectedCategory.value) {
-    filteredQuestions = filteredQuestions.filter(q => q.category._ref === selectedCategory.value);
+    filteredQuestions = filteredQuestions.filter(q => q.category._id === selectedCategory.value);
   }
   
   if (selectedDifficulty.value) {
@@ -440,6 +366,5 @@ const resetQuiz = () => {
   quizQuestions.value = [];
 };
 
-// Initialize categories for the setup screen
-categories.value = sampleCategories;
+// Categories are now available via props
 </script>

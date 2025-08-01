@@ -4,7 +4,7 @@
     <div class="mb-8">
       <div class="flex flex-wrap gap-4 justify-center">
         <button
-          v-for="category in categories"
+          v-for="category in props.categories"
           :key="category._id"
           @click="selectedCategory = category._id"
           :class="[
@@ -50,28 +50,8 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="loading" class="text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-      <p class="mt-4 text-gray-600">Loading questions...</p>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="text-center py-12">
-      <div class="text-red-600 mb-4">
-        <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Error Loading Questions</h3>
-      <p class="text-gray-600 mb-4">{{ error }}</p>
-      <button @click="loadQuestions" class="btn-primary">
-        Try Again
-      </button>
-    </div>
-
     <!-- Questions Grid -->
-    <div v-else class="grid gap-6">
+    <div class="grid gap-6">
       <div
         v-for="question in filteredQuestions"
         :key="question._id"
@@ -152,84 +132,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import type { Question, Category } from '../lib/sanity';
 
-const questions = ref<Question[]>([]);
-const categories = ref<Category[]>([]);
-const loading = ref(true);
-const error = ref<string | null>(null);
+// Props from parent component
+interface Props {
+  questions: Question[];
+  categories: Category[];
+}
+
+const props = defineProps<Props>();
+
 const selectedCategory = ref<string | null>(null);
 const searchQuery = ref('');
 
-// Sample data for development/demo purposes
-const sampleQuestions: Question[] = [
-  {
-    _id: '1',
-    _type: 'question',
-    title: 'Component Development',
-    question: 'What is the recommended way to create a new component in AEM?',
-    options: [
-      'Copy an existing component and modify it',
-      'Use the AEM Component Console',
-      'Create it manually in CRXDE Lite',
-      'Use Maven archetype for AEM projects'
-    ],
-    correctAnswer: 3,
-    explanation: 'Using Maven archetype ensures proper structure and follows AEM best practices.',
-    category: {
-      _ref: 'cat1',
-      _type: 'reference'
-    },
-    difficulty: 'intermediate',
-    tags: ['components', 'maven', 'development']
-  },
-  {
-    _id: '2', 
-    _type: 'question',
-    title: 'Sling Models',
-    question: 'Which annotation is used to inject a resource property in a Sling Model?',
-    options: [
-      '@ValueMapValue',
-      '@ResourcePath', 
-      '@ChildResource',
-      '@SlingObject'
-    ],
-    correctAnswer: 0,
-    explanation: '@ValueMapValue is used to inject properties from the resource\'s ValueMap.',
-    category: {
-      _ref: 'cat2',
-      _type: 'reference'
-    },
-    difficulty: 'beginner',
-    tags: ['sling', 'models', 'annotations']
-  }
-];
-
-const sampleCategories: Category[] = [
-  {
-    _id: 'cat1',
-    _type: 'category',
-    name: 'Component Development',
-    slug: { current: 'component-development' },
-    description: 'Creating and managing AEM components',
-    color: '#4375be'
-  },
-  {
-    _id: 'cat2',
-    _type: 'category', 
-    name: 'Sling Framework',
-    slug: { current: 'sling-framework' },
-    description: 'Apache Sling concepts and implementation',
-    color: '#10b981'
-  }
-];
-
 const filteredQuestions = computed(() => {
-  let filtered = questions.value;
+  let filtered = props.questions;
   
   if (selectedCategory.value) {
-    filtered = filtered.filter(q => q.category._ref === selectedCategory.value);
+    filtered = filtered.filter(q => q.category._id === selectedCategory.value);
   }
   
   if (searchQuery.value.trim()) {
@@ -244,38 +165,5 @@ const filteredQuestions = computed(() => {
   return filtered;
 });
 
-const loadQuestions = async () => {
-  try {
-    loading.value = true;
-    error.value = null;
-    
-    // TODO: Replace with actual Sanity API call
-    // const [questionsResponse, categoriesResponse] = await Promise.all([
-    //   sanityClient.fetch(queries.allQuestions),
-    //   sanityClient.fetch(queries.allCategories)
-    // ]);
-    
-    // For now, use sample data
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-    questions.value = sampleQuestions.map(q => ({
-      ...q,
-      category: sampleCategories.find(c => c._id === q.category._ref) || q.category
-    })) as Question[];
-    
-    categories.value = sampleCategories.map(cat => ({
-      ...cat,
-      questionCount: sampleQuestions.filter(q => q.category._ref === cat._id).length
-    })) as Category[];
-    
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to load questions';
-    console.error('Error loading questions:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(() => {
-  loadQuestions();
-});
+// No need for loadQuestions anymore since data comes from props
 </script>
