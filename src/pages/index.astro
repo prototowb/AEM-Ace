@@ -16,10 +16,10 @@ import Layout from '../layouts/Layout.astro';
             Ace the Adobe AEM Site Developer Professional Exam (AD0-E128) with our comprehensive quiz platform and Q&A catalog.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/quiz" class="btn-secondary">
+            <a href={import.meta.env.BASE_URL + 'quiz'} class="btn-secondary">
               Start Quiz
             </a>
-            <a href="/catalog" class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-200">
+            <a href={import.meta.env.BASE_URL + 'catalog'} class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-200">
               Browse Q&A
             </a>
           </div>
@@ -88,7 +88,7 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-xl text-gray-600 mb-8">
           Join thousands of developers who have successfully passed their AEM certification.
         </p>
-        <a href="/quiz" class="btn-primary">
+        <a href={import.meta.env.BASE_URL + 'quiz'} class="btn-primary">
           Start Your First Quiz
         </a>
       </div>

@@ -21,20 +21,20 @@ const { title, description = "Master the Adobe AEM Site Developer Professional E
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <a href="/" class="text-2xl font-heading font-bold text-primary">
+            <a href={import.meta.env.BASE_URL} class="text-2xl font-heading font-bold text-primary">
               AEM Ace
             </a>
           </div>
           
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
-              <a href="/" class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href={import.meta.env.BASE_URL} class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Home
               </a>
-              <a href="/catalog" class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href={import.meta.env.BASE_URL + 'catalog'} class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Q&A Catalog
               </a>
-              <a href="/quiz" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+              <a href={import.meta.env.BASE_URL + 'quiz'} class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
                 Take Quiz
               </a>
             </div>
