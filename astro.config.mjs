@@ -7,12 +7,6 @@ import sanity from '@sanity/astro';
 // https://astro.build/config
 export default defineConfig({
   output: 'static', // Static site generation
-  site: process.env.CI 
-    ? 'https://YOUR-GITHUB-USERNAME.github.io' 
-    : 'http://localhost:4321',
-  base: process.env.CI 
-    ? '/AEM-Ace' 
-    : '',
   integrations: [
     vue(), 
     tailwind(),
