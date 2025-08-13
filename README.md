@@ -75,8 +75,10 @@ Users can submit quiz questions via the new Submit page (`/submit`). Submissions
 
 ### Server-side configuration
 
-1. Create a Sanity token with write access.
-2. Add environment variable `SANITY_WRITE_TOKEN` in your Vercel project settings (and locally when testing functions).
+1. Create Sanity tokens with write access.
+2. Add environment variables (locally and in Vercel):
+   - `SANITY_CONTRIBUTER_TOKEN` (minimal write; used for question submissions as drafts)
+   - `SANITY_EDITOR_TOKEN` (broader write; used for vote create/update/delete, also fallback for submissions)
 3. Ensure the `questionSubmission` schema exists in your Sanity Studio (this repo exports it in `sanity-schema.js`).
 
 ### How it works

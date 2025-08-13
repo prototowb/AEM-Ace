@@ -37,7 +37,8 @@ export async function POST({ request }: { request: Request }) {
       return new Response(JSON.stringify({ message: 'Validation failed', errors }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const token = (import.meta.env.SANITY_WRITE_TOKEN as string | undefined) || process.env.SANITY_WRITE_TOKEN;
+    const token = (import.meta.env.SANITY_CONTRIBUTER_TOKEN as string | undefined)
+      || (import.meta.env.SANITY_EDITOR_TOKEN as string | undefined);
     if (!token) {
       return new Response(JSON.stringify({ message: 'Server misconfiguration' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
@@ -50,12 +51,14 @@ export async function POST({ request }: { request: Request }) {
       apiVersion: '2024-10-01'
     });
 
+    const normalizedCorrectAnswers = Array.from(new Set(correctAnswers as number[])).sort((a, b) => (a as number) - (b as number)) as number[];
+
     const doc = {
       _type: 'questionSubmission',
       title: title.trim(),
       question: question.trim(),
       options: options.map((o: string) => o.trim()),
-      correctAnswers: Array.from(new Set(correctAnswers)).sort((a: number, b: number) => a - b),
+      correctAnswers: normalizedCorrectAnswers,
       isMultipleChoice: Array.isArray(correctAnswers) && correctAnswers.length > 1,
       explanation: explanation ? String(explanation).trim() : undefined,
       category: { _type: 'reference', _ref: categoryId },

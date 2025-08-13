@@ -217,5 +217,41 @@ export const blogPostSchema = {
   ]
 };
 
+// Track per-question votes by anonymous session
+export const voteSchema = {
+  name: 'vote',
+  title: 'Question Vote',
+  type: 'document',
+  fields: [
+    {
+      name: 'question',
+      title: 'Question',
+      type: 'reference',
+      to: [{ type: 'question' }],
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'sessionId',
+      title: 'Session ID',
+      type: 'string',
+      description: 'Anonymous session identifier used to prevent duplicate voting',
+      validation: Rule => Rule.required().min(10)
+    },
+    {
+      name: 'value',
+      title: 'Value',
+      type: 'number',
+      description: 'Vote value: +1 for upvote, -1 for downvote',
+      validation: Rule => Rule.required().min(-1).max(1)
+    },
+    {
+      name: 'createdAt',
+      title: 'Created At',
+      type: 'datetime',
+      initialValue: () => new Date().toISOString()
+    }
+  ]
+};
+
 // Export all schemas
-export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema];
+export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema, voteSchema];
