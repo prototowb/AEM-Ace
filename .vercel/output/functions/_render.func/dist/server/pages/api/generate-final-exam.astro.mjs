@@ -1,6 +1,6 @@
-import { s as sanityClient } from '../../chunks/sanity_DJvb4Jcn.mjs';
-import { createClient } from '@sanity/client';
-export { r as renderers } from '../../chunks/_@astro-renderers_CwiFq2f9.mjs';
+import { s as sanityClient } from '../../chunks/sanity_Dt0Q_iu_.mjs';
+import { c as createClient } from '../../chunks/index_C8HRO8Dy.mjs';
+export { r as renderers } from '../../chunks/_@astro-renderers_Db-vPf1k.mjs';
 
 const prerender = false;
 const POST = async ({ request }) => {
