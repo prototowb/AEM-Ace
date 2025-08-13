@@ -18,11 +18,27 @@ export default defineConfig({
     maxDuration: 60,
     webAnalytics: {
       enabled: false
-    }
+    },
+    excludeFiles: [
+      'node_modules/**/*.map',
+      'node_modules/**/*.d.ts',
+      'node_modules/**/test/**',
+      'node_modules/**/tests/**',
+      'node_modules/**/__tests__/**',
+      'node_modules/**/docs/**',
+      'node_modules/**/examples/**',
+      'node_modules/**/*.md'
+    ]
   }) : undefined,
   vite: {
     ssr: { 
-      noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue', '@vue/compiler-dom', '@vue/compiler-sfc']
+      noExternal: [
+        'vue', 
+        '@vue/server-renderer', 
+        '@vue/compiler-dom',
+        '@vue/compiler-sfc',
+        '@astrojs/vue'
+      ]
     },
     resolve: {
       dedupe: ['react', 'react-dom', 'vue']
@@ -30,6 +46,17 @@ export default defineConfig({
     optimizeDeps: {
       include: ['react', 'react-dom', 'vue', '@astrojs/vue'],
       exclude: ['fsevents']
+    },
+    build: {
+      rollupOptions: {
+        external: ['fsevents'],
+        output: {
+          manualChunks: {
+            'vue-vendor': ['vue', '@vue/server-renderer', '@vue/compiler-dom'],
+            'react-vendor': ['react', 'react-dom']
+          }
+        }
+      }
     }
   },
   integrations: [
