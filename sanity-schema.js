@@ -117,6 +117,38 @@ export const questionSchema = {
   ]
 };
 
+// Submissions for moderation
+export const questionSubmissionSchema = {
+  name: 'questionSubmission',
+  title: 'Question Submission',
+  type: 'document',
+  fields: [
+    { name: 'title', title: 'Title', type: 'string', validation: Rule => Rule.required() },
+    { name: 'question', title: 'Question', type: 'text', validation: Rule => Rule.required() },
+    { name: 'options', title: 'Options', type: 'array', of: [{ type: 'string' }], validation: Rule => Rule.required().min(2).max(6) },
+    { name: 'correctAnswers', title: 'Correct Answer Indices', type: 'array', of: [{ type: 'number' }], validation: Rule => Rule.required().min(1) },
+    { name: 'isMultipleChoice', title: 'Multiple Correct Answers', type: 'boolean', initialValue: false },
+    { name: 'explanation', title: 'Explanation', type: 'text' },
+    { name: 'category', title: 'Category', type: 'reference', to: [{ type: 'category' }], validation: Rule => Rule.required() },
+    { name: 'difficulty', title: 'Difficulty', type: 'string', options: { list: [
+      { title: 'Beginner', value: 'beginner' },
+      { title: 'Intermediate', value: 'intermediate' },
+      { title: 'Advanced', value: 'advanced' }
+    ]}, validation: Rule => Rule.required() },
+    { name: 'tags', title: 'Tags', type: 'array', of: [{ type: 'string' }] },
+    { name: 'submitter', title: 'Submitter', type: 'object', fields: [
+      { name: 'name', title: 'Name', type: 'string' },
+      { name: 'email', title: 'Email', type: 'string' }
+    ]},
+    { name: 'status', title: 'Status', type: 'string', options: { list: [
+      { title: 'Pending', value: 'pending' },
+      { title: 'Approved', value: 'approved' },
+      { title: 'Rejected', value: 'rejected' }
+    ]}, initialValue: 'pending' },
+    { name: 'submittedAt', title: 'Submitted At', type: 'datetime' }
+  ]
+};
+
 export const blogPostSchema = {
   name: 'post',
   title: 'Blog Post',
@@ -186,4 +218,4 @@ export const blogPostSchema = {
 };
 
 // Export all schemas
-export const schemas = [categorySchema, questionSchema, blogPostSchema];
+export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema];

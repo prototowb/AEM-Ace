@@ -69,6 +69,22 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 
 The site will be available at `https://your-project-name.vercel.app`
 
+## 🙋‍♂️ User Question Submissions
+
+Users can submit quiz questions via the new Submit page (`/submit`). Submissions are stored in Sanity as `questionSubmission` documents for moderation.
+
+### Server-side configuration
+
+1. Create a Sanity token with write access.
+2. Add environment variable `SANITY_WRITE_TOKEN` in your Vercel project settings (and locally when testing functions).
+3. Ensure the `questionSubmission` schema exists in your Sanity Studio (this repo exports it in `sanity-schema.js`).
+
+### How it works
+
+- The frontend shows a form with validation.
+- A serverless API (`/api/submit-question`) validates payloads and writes documents to Sanity using the token.
+- Submissions are marked `status: pending` for review in Studio before being added to the main catalog.
+
 ## 📝 Content Management
 
 Content is managed through Sanity Studio. The schema includes:
