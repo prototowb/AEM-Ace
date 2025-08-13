@@ -1,6 +1,4 @@
-import { e as createComponent, f as createAstro, r as renderTemplate, l as renderSlot, n as renderHead, h as addAttribute } from './astro/server_B4bmrHlw.mjs';
-import 'kleur/colors';
-import 'clsx';
+import { e as createComponent, f as createAstro, r as renderTemplate, o as renderSlot, p as renderHead, h as addAttribute } from './astro/server_DeWV9nz_.mjs';
 /* empty css                           */
 
 var __freeze = Object.freeze;

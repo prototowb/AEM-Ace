@@ -1,4 +1,4 @@
-import { createClient } from '@sanity/client';
+import { c as createClient } from './index_C8HRO8Dy.mjs';
 
 const sanityClient = createClient({
   projectId: "z5tty2va",
