@@ -4,7 +4,7 @@ export const sanityClient = createClient({
   projectId: 'z5tty2va', // Replace with your Sanity project ID
   dataset: 'production', // Replace with your dataset name
   useCdn: true, // Set to false if statically generating pages, using ISR, or if you need the freshest data
-  apiVersion: '2025-08-01', // Use current date (YYYY-MM-DD) to target the latest API version
+  apiVersion: '2024-10-01', // Use a valid API version date (YYYY-MM-DD)
 });
 
 // Define types for our data structures
