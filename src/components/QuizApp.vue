@@ -7,6 +7,14 @@
           Choose Your Quiz Settings
         </h2>
         
+        <!-- Final Exam Toggle -->
+        <div class="mb-6 flex items-center gap-3">
+          <input id="finalExamToggle" type="checkbox" v-model="finalExamMode" class="h-4 w-4 text-primary border-gray-300 rounded" />
+          <label for="finalExamToggle" class="text-sm text-gray-800">
+            Use curated Final Exam (top-voted questions)
+          </label>
+        </div>
+
         <!-- Category Selection -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-3">
@@ -15,6 +23,7 @@
           <select
             v-model="selectedCategory"
             class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+            :disabled="finalExamMode"
           >
             <option value="">All Categories (Mixed Quiz)</option>
             <option 
@@ -51,6 +60,7 @@
           <select
             v-model="selectedDifficulty"
             class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+            :disabled="finalExamMode"
           >
             <option value="">All Levels</option>
             <option value="beginner">Beginner</option>
@@ -65,7 +75,7 @@
           class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="loading">Loading...</span>
-          <span v-else>Start Quiz</span>
+          <span v-else>{{ finalExamMode ? 'Start Final Exam' : 'Start Quiz' }}</span>
         </button>
       </div>
     </div>
@@ -312,6 +322,7 @@ const numberOfQuestions = ref(10);
 // Data
 const quizQuestions = ref<Question[]>([]);
 const loading = ref(false);
+const finalExamMode = ref(false);
 
 // No sample data needed - using props
 
@@ -342,6 +353,10 @@ const averageTime = computed(() =>
 // Methods
 const startQuiz = async () => {
   loading.value = true;
+  if (finalExamMode.value) {
+    await startFinalExam();
+    return;
+  }
   
   // Filter questions based on settings
   let filteredQuestions = [...props.questions];
@@ -374,6 +389,44 @@ const startQuiz = async () => {
   startTime.value = Date.now();
   
   loading.value = false;
+};
+
+const startFinalExam = async () => {
+  try {
+    // Try to fetch latest paper
+    let res = await fetch('/api/generate-final-exam');
+    if (res.status === 404) {
+      // Generate with defaults based on numberOfQuestions
+      await fetch('/api/generate-final-exam', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size: Number(numberOfQuestions.value), minVotes: 10, minRatio: 0.7, balanced: true })
+      });
+      res = await fetch('/api/generate-final-exam');
+    }
+    if (!res.ok) throw new Error('Failed to load final exam');
+    const paper = await res.json();
+    const items = Array.isArray(paper?.questions) ? paper.questions : [];
+    if (items.length === 0) {
+      alert('No curated questions available yet. Collect more votes and try again.');
+      loading.value = false;
+      return;
+    }
+    quizQuestions.value = items.slice(0, Number(numberOfQuestions.value));
+
+    // Reset quiz state
+    currentQuestionIndex.value = 0;
+    selectedAnswers.value = [];
+    userAnswers.value = [];
+    questionTimes.value = [];
+    hasSubmittedAnswer.value = false;
+    isQuizStarted.value = true;
+    startTime.value = Date.now();
+  } catch {
+    alert('Unable to start Final Exam right now.');
+  } finally {
+    loading.value = false;
+  }
 };
 
 const toggleAnswer = (answerIndex: number) => {

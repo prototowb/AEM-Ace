@@ -6,6 +6,8 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 
 - **Interactive Quiz**: Multiple-choice quizzes with automatic scoring and instant feedback
 - **Q&A Catalog**: Browse and study comprehensive question pools organized by categories
+- **Voting & Curation**: Upvote/downvote questions to surface quality content and build a curated exam pool
+- **Final Exam Mode**: Generate and take a curated “final exam” based on community votes
 - **Multiple Answer Support**: Handle both single and multiple correct answer questions
 - **Responsive Design**: Beautiful, modern UI that works on all devices
 - **Content Management**: Powered by Sanity CMS for easy content updates
@@ -26,8 +28,9 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 │   └── .nojekyll
 ├── src/
 │   ├── components/
-│   │   ├── QACatalog.vue      # Q&A catalog component
-│   │   └── QuizApp.vue        # Interactive quiz component
+│   │   ├── QACatalog.vue      # Q&A catalog component (lazy-loaded)
+│   │   ├── QuizApp.vue        # Interactive quiz component
+│   │   └── FinalExam.vue      # Curated Final Exam component
 │   ├── layouts/
 │   │   └── Layout.astro       # Main layout template
 │   ├── lib/
@@ -36,6 +39,7 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 │   │   ├── index.astro        # Homepage
 │   │   ├── catalog.astro      # Q&A catalog page
 │   │   ├── quiz.astro         # Quiz page
+│   │   ├── final-exam.astro   # Final Exam page
 │   │   └── 404.astro          # 404 error page
 │   └── styles/
 │       └── global.css         # Global styles
@@ -69,6 +73,42 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 
 The site will be available at `https://your-project-name.vercel.app`
 
+## 🔧 Setup
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+2. Start dev server
+
+```bash
+npm run dev
+```
+
+3. Build and preview
+
+```bash
+npm run build
+npm run preview
+```
+
+## ⚙️ Environment Variables
+
+Set the following in your local `.env` (and Vercel project settings):
+
+- `SANITY_CONTRIBUTER_TOKEN`: minimal write scope (draft creation, optional fallback for votes)
+- `SANITY_EDITOR_TOKEN`: broader write scope (votes, final exam generation)
+
+## 🌐 Pages
+
+- `/` Home
+- `/catalog` Q&A Catalog (search, filter by category, voting; lazy loaded)
+- `/quiz` Interactive mixed quiz
+- `/final-exam` Curated final exam (2 minutes per question timer)
+- `/submit` Submit a new question (stored as `questionSubmission`)
+
 ## 🙋‍♂️ User Question Submissions
 
 Users can submit quiz questions via the new Submit page (`/submit`). Submissions are stored in Sanity as `questionSubmission` documents for moderation.
@@ -86,6 +126,56 @@ Users can submit quiz questions via the new Submit page (`/submit`). Submissions
 - The frontend shows a form with validation.
 - A serverless API (`/api/submit-question`) validates payloads and writes documents to Sanity using the token.
 - Submissions are marked `status: pending` for review in Studio before being added to the main catalog.
+
+## 🗳️ Voting & Curation
+
+- Voting uses anonymous sessions (no login) and stores one `vote` document per session+question with `value ∈ {+1, -1}`.
+- Aggregations are computed in GROQ on read; no counters stored on the question docs.
+
+### Endpoints and parameters
+- `POST /api/submit-vote`
+  - Body: `{ questionId: string, value: 1 | -1 | 0, sessionId?: string }`
+  - `value: 0` removes existing vote; resubmitting the same value toggles it off.
+  - Token: `SANITY_EDITOR_TOKEN` (preferred), falls back to `SANITY_CONTRIBUTER_TOKEN`.
+
+- `GET /api/questions`
+  - Query: `offset` (default 0), `limit` (default 20, max 50), `categoryId?`, `search?`
+  - Returns: `{ items, total, offset, limit, hasMore }`
+
+### Environment variables
+- `SANITY_CONTRIBUTER_TOKEN`: minimal write scope (draft creation, optional fallback for votes)
+- `SANITY_EDITOR_TOKEN`: broader write scope (votes, final exam generation)
+
+## 🎓 Final Exam (Curated Pool)
+
+The Final Exam uses voted questions to build a curated exam and freezes each paper in a `finalExamPaper` document.
+
+### UI
+- Dedicated page at `/final-exam` with its own flow and timer.
+- Time limit scales with the number of questions at 2 minutes per question (e.g., 50 → 100 minutes).
+- If no paper exists and generation fails/has zero candidates, the UI redirects to `/404`.
+
+### API
+- `POST /api/generate-final-exam`
+  - Body (all optional; defaults in parentheses):
+    - `size` (50): number of questions
+    - `minVotes` (10): minimum total votes per question
+    - `minRatio` (0.7): minimum upvote ratio
+    - `balanced` (false): balance picks across categories
+    - `title` (auto): paper title
+  - Behavior: queries eligible questions via GROQ, orders by score/totalVotes/updatedAt, shuffles in code, trims to `size`, and creates a `finalExamPaper`.
+  - Token: `SANITY_EDITOR_TOKEN` (preferred) or `SANITY_CONTRIBUTER_TOKEN`.
+
+- `GET /api/generate-final-exam`
+  - Params: `id?` (specific paper); when omitted returns latest paper.
+
+### Defaults used in UI
+- `FinalExam.vue` generation call currently uses relaxed thresholds to enable local testing with empty pools:
+  - `minVotes: 0`, `minRatio: 0`, `balanced: true`
+  - Adjust these in `FinalExam.vue` if you want to enforce curation before availability.
+
+### Schema
+- `finalExamPaper`: `{ title?, questions: reference[], generatedAt, criteria: { size, minVotes, minRatio, balanced } }`
 
 ## 📝 Content Management
 
