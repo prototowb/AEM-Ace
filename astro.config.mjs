@@ -17,6 +17,7 @@ export default defineConfig({
     ]
   }),
   vite: {
+    ssr: { noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue'] },
     resolve: {
       dedupe: ['react', 'react-dom']
     },

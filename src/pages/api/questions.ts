@@ -1,7 +1,8 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import { sanityClient } from '../../lib/sanity';
+import { sanityClient as publicClient } from '../../lib/sanity';
+import { createClient } from '@sanity/client';
 
 export const GET: APIRoute = async ({ url }) => {
   try {
@@ -42,9 +43,14 @@ export const GET: APIRoute = async ({ url }) => {
     const query = `*[$filter] | order(_createdAt desc) [$offset...$end] ${projection}`.replace('$filter', filter);
     const countQuery = `count(*[$filter])`.replace('$filter', filter);
 
+    const token = (import.meta.env.SANITY_EDITOR_TOKEN as string | undefined) || (import.meta.env.SANITY_CONTRIBUTER_TOKEN as string | undefined);
+    const client = token
+      ? createClient({ projectId: 'z5tty2va', dataset: 'production', apiVersion: '2024-10-01', useCdn: false, token })
+      : publicClient;
+
     const [items, total] = await Promise.all([
-      sanityClient.fetch(query, { categoryId, search, offset, end }),
-      sanityClient.fetch(countQuery, { categoryId, search })
+      client.fetch(query, { categoryId, search, offset, end }),
+      client.fetch(countQuery, { categoryId, search })
     ]);
 
     const hasMore = offset + items.length < total;
