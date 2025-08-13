@@ -1,0 +1,34 @@
+
+> aem-ace@0.0.1 dev
+> astro dev
+
+22:24:38 [types] Generated 1ms
+22:24:38 [content] Syncing content
+22:24:38 [content] Synced content
+
+ astro  v5.12.5 ready in 483 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+
+22:24:38 watching for file changes...
+✘ [ERROR] No loader is configured for ".node" files: node_modules/fsevents/fsevents.node
+
+    node_modules/fsevents/fsevents.js:13:23:
+      13 │ const Native = require("./fsevents.node");
+         ╵                        ~~~~~~~~~~~~~~~~~
+
+22:24:38 [ERROR] [UnhandledRejection] Astro detected an unhandled rejection. Here's the stack trace:
+Error: Build failed with 1 error:
+node_modules/fsevents/fsevents.js:13:23: ERROR: No loader is configured for ".node" files: node_modules/fsevents/fsevents.node
+    at failureErrorWithLog (/Users/2049576/Private Projects/AEM Ace/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/2049576/Private Projects/AEM Ace/node_modules/esbuild/lib/main.js:926:25
+    at /Users/2049576/Private Projects/AEM Ace/node_modules/esbuild/lib/main.js:1345:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+  Hint:
+    Make sure your promises all have an `await` or a `.catch()` handler.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/unhandled-rejection/
+  Stack trace:
+    at /Users/2049576/Private Projects/AEM Ace/node_modules/fsevents/fsevents.js: ERROR: No loader is configured for ".node" files: node_modules/fsevents/fsevents.node:13:23
+    [...] See full stack trace in the browser, or rerun with --verbose.

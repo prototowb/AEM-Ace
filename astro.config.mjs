@@ -6,21 +6,23 @@ import tailwind from '@astrojs/tailwind';
 // import sanity from '@sanity/astro';
 import vercel from '@astrojs/vercel';
 
+// Check if we're building for production (Vercel)
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel({
+  // Only use adapter for production builds
+  adapter: isProduction ? vercel({
     functionPerRoute: false,
-    maxDuration: 60
-  }),
+    maxDuration: 60,
+    webAnalytics: {
+      enabled: false
+    }
+  }) : undefined,
   vite: {
     ssr: { 
       noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue']
-    },
-    build: {
-      rollupOptions: {
-        external: ['fsevents']
-      }
     },
     resolve: {
       dedupe: ['react', 'react-dom', 'vue']
