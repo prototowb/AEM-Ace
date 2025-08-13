@@ -1,0 +1,7 @@
+import { createClient } from '@sanity/client';
+
+const sanityClient = createClient(
+            {"apiVersion":"v2023-08-24","projectId":"z5tty2va","dataset":"production","useCdn":true}
+          );
+
+export { sanityClient as s };

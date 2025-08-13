@@ -4,10 +4,12 @@ import vue from '@astrojs/vue';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static', // Static site generation
+  output: 'server',
+  adapter: vercel(),
   vite: {
     resolve: {
       dedupe: ['react', 'react-dom']
