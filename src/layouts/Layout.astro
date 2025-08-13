@@ -49,11 +49,21 @@ import '../styles/global.css';
           
           <!-- Mobile menu button -->
           <div class="md:hidden">
-            <button type="button" class="bg-gray-50 p-2 rounded-md text-gray-900 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary">
+            <button id="mobile-menu-btn" type="button" class="bg-gray-50 p-2 rounded-md text-gray-900 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary" aria-controls="mobile-menu" aria-expanded="false">
               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+          </div>
+        </div>
+        <!-- Mobile menu panel -->
+        <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 py-3">
+          <div class="flex flex-col space-y-1">
+            <a href="/" class="block px-3 py-2 text-gray-900 hover:text-primary">Home</a>
+            <a href="/catalog" class="block px-3 py-2 text-gray-900 hover:text-primary">Q&A Catalog</a>
+            <a href="/submit" class="block px-3 py-2 text-gray-900 hover:text-primary">Submit Question</a>
+            <a href="/quiz" class="block px-3 py-2 text-white bg-primary rounded-md mx-3 text-center">Take Quiz</a>
+            <a href="/final-exam" class="block px-3 py-2 text-gray-900 hover:text-primary">Final Exam</a>
           </div>
         </div>
       </nav>
@@ -77,6 +87,16 @@ import '../styles/global.css';
       </div>
     </footer>
 
-    
+    <script is:inline>
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          const isHidden = menu.classList.contains('hidden');
+          menu.classList.toggle('hidden');
+          btn.setAttribute('aria-expanded', String(isHidden));
+        }, { passive: true });
+      }
+    </script>
   </body>
 </html>
