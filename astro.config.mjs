@@ -22,7 +22,7 @@ export default defineConfig({
   }) : undefined,
   vite: {
     ssr: { 
-      noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue']
+      noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue', '@vue/compiler-dom', '@vue/compiler-sfc']
     },
     resolve: {
       dedupe: ['react', 'react-dom', 'vue']
