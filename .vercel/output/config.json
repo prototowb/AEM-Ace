@@ -44,23 +44,7 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^/catalog/?$",
-			"dest": "_render"
-		},
-		{
 			"src": "^/final-exam/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/quiz/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/submit/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/$",
 			"dest": "_render"
 		},
 		{
