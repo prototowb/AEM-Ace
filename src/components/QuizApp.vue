@@ -7,13 +7,7 @@
           Choose Your Quiz Settings
         </h2>
         
-        <!-- Final Exam Toggle -->
-        <div class="mb-6 flex items-center gap-3">
-          <input id="finalExamToggle" type="checkbox" v-model="finalExamMode" class="h-4 w-4 text-primary border-gray-300 rounded" />
-          <label for="finalExamToggle" class="text-sm text-gray-800">
-            Use curated Final Exam (top-voted questions)
-          </label>
-        </div>
+        
 
         <!-- Category Selection -->
         <div class="mb-6">
@@ -23,7 +17,6 @@
           <select
             v-model="selectedCategory"
             class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-            :disabled="finalExamMode"
           >
             <option value="">All Categories (Mixed Quiz)</option>
             <option 
@@ -60,7 +53,6 @@
           <select
             v-model="selectedDifficulty"
             class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-            :disabled="finalExamMode"
           >
             <option value="">All Levels</option>
             <option value="beginner">Beginner</option>
@@ -75,7 +67,7 @@
           class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="loading">Loading...</span>
-          <span v-else>{{ finalExamMode ? 'Start Final Exam' : 'Start Quiz' }}</span>
+          <span v-else>Start Quiz</span>
         </button>
       </div>
     </div>
@@ -303,7 +295,9 @@ interface Props {
   categories: Category[];
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  questions: () => [],
+});
 
 // Quiz state
 const isQuizStarted = ref(false);
@@ -322,7 +316,7 @@ const numberOfQuestions = ref(10);
 // Data
 const quizQuestions = ref<Question[]>([]);
 const loading = ref(false);
-const finalExamMode = ref(false);
+// final exam functionality removed; handled on a separate page
 
 // No sample data needed - using props
 
@@ -353,25 +347,37 @@ const averageTime = computed(() =>
 // Methods
 const startQuiz = async () => {
   loading.value = true;
-  if (finalExamMode.value) {
-    await startFinalExam();
-    return;
+  // Build pool of questions
+  let pool: Question[] = [];
+  if (props.questions && props.questions.length > 0) {
+    pool = [...props.questions];
+  } else {
+    // Fetch from API when not provided
+    try {
+      const params = new URLSearchParams();
+      params.set('limit', '50');
+      if (selectedCategory.value) params.set('categoryId', selectedCategory.value);
+      const res = await fetch(`/api/questions?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        pool = Array.isArray(data?.items) ? data.items : [];
+      }
+    } catch {
+      // ignore and fall through with empty pool
+    }
   }
-  
-  // Filter questions based on settings
-  let filteredQuestions = [...props.questions];
-  
+
+  // Apply filters
   if (selectedCategory.value) {
-    filteredQuestions = filteredQuestions.filter(q => q.category._id === selectedCategory.value);
+    pool = pool.filter(q => q.category._id === selectedCategory.value);
   }
-  
   if (selectedDifficulty.value) {
-    filteredQuestions = filteredQuestions.filter(q => q.difficulty === selectedDifficulty.value);
+    pool = pool.filter(q => q.difficulty === selectedDifficulty.value);
   }
-  
+
   // Shuffle and take requested number of questions
-  const shuffled = filteredQuestions.sort(() => Math.random() - 0.5);
-  quizQuestions.value = shuffled.slice(0, Math.min(numberOfQuestions.value, shuffled.length));
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  quizQuestions.value = shuffled.slice(0, Math.min(Number(numberOfQuestions.value), shuffled.length));
   
   if (quizQuestions.value.length === 0) {
     alert('No questions available for the selected criteria. Please try different settings.');
@@ -391,43 +397,7 @@ const startQuiz = async () => {
   loading.value = false;
 };
 
-const startFinalExam = async () => {
-  try {
-    // Try to fetch latest paper
-    let res = await fetch('/api/generate-final-exam');
-    if (res.status === 404) {
-      // Generate with defaults based on numberOfQuestions
-      await fetch('/api/generate-final-exam', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ size: Number(numberOfQuestions.value), minVotes: 10, minRatio: 0.7, balanced: true })
-      });
-      res = await fetch('/api/generate-final-exam');
-    }
-    if (!res.ok) throw new Error('Failed to load final exam');
-    const paper = await res.json();
-    const items = Array.isArray(paper?.questions) ? paper.questions : [];
-    if (items.length === 0) {
-      alert('No curated questions available yet. Collect more votes and try again.');
-      loading.value = false;
-      return;
-    }
-    quizQuestions.value = items.slice(0, Number(numberOfQuestions.value));
-
-    // Reset quiz state
-    currentQuestionIndex.value = 0;
-    selectedAnswers.value = [];
-    userAnswers.value = [];
-    questionTimes.value = [];
-    hasSubmittedAnswer.value = false;
-    isQuizStarted.value = true;
-    startTime.value = Date.now();
-  } catch {
-    alert('Unable to start Final Exam right now.');
-  } finally {
-    loading.value = false;
-  }
-};
+// startFinalExam removed
 
 const toggleAnswer = (answerIndex: number) => {
   if (isAnswered.value) return;
