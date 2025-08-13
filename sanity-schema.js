@@ -253,5 +253,34 @@ export const voteSchema = {
   ]
 };
 
+// Stored, frozen exam papers generated from curated pool
+export const finalExamPaperSchema = {
+  name: 'finalExamPaper',
+  title: 'Final Exam Paper',
+  type: 'document',
+  fields: [
+    { name: 'title', title: 'Title', type: 'string' },
+    {
+      name: 'questions',
+      title: 'Questions',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'question' }] }],
+      validation: Rule => Rule.required().min(1)
+    },
+    { name: 'generatedAt', title: 'Generated At', type: 'datetime' },
+    {
+      name: 'criteria',
+      title: 'Criteria',
+      type: 'object',
+      fields: [
+        { name: 'size', title: 'Size', type: 'number' },
+        { name: 'minVotes', title: 'Min Votes', type: 'number' },
+        { name: 'minRatio', title: 'Min Upvote Ratio', type: 'number' },
+        { name: 'balanced', title: 'Balanced By Category', type: 'boolean' }
+      ]
+    }
+  ]
+};
+
 // Export all schemas
-export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema, voteSchema];
+export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema, voteSchema, finalExamPaperSchema];
