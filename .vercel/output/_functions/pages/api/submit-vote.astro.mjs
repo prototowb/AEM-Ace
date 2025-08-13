@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-export { renderers } from '../../renderers.mjs';
+export { r as renderers } from '../../chunks/_@astro-renderers_wXmDkZlw.mjs';
 
 const prerender = false;
 async function POST({ request }) {

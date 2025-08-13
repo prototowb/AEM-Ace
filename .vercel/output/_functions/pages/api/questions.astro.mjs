@@ -1,5 +1,6 @@
-import { s as sanityClient } from '../../chunks/sanity_5NUE8U2-.mjs';
-export { renderers } from '../../renderers.mjs';
+import { s as sanityClient } from '../../chunks/sanity_DJvb4Jcn.mjs';
+import { createClient } from '@sanity/client';
+export { r as renderers } from '../../chunks/_@astro-renderers_wXmDkZlw.mjs';
 
 const prerender = false;
 const GET = async ({ url }) => {
@@ -35,9 +36,11 @@ const GET = async ({ url }) => {
     }`;
     const query = `*[$filter] | order(_createdAt desc) [$offset...$end] ${projection}`.replace("$filter", filter);
     const countQuery = `count(*[$filter])`.replace("$filter", filter);
+    const token = "skYpN1vCXXZVzuvAdsrllpFb9ItUwvuMimuTRsB9SXcvlHngbqnnCkFs4WdDBGEDI4fNjOJjTkzLXCc5jnuGxX0Tl2bjNhqlMZ2gzfKrw2lhO9lajrGyr5zLlClCaMrzKdNcJmVZJz1t4uKeePufycbBwShxGoWsV1CJS7pyQNG7G2WyCMkU";
+    const client = token ? createClient({ projectId: "z5tty2va", dataset: "production", apiVersion: "2024-10-01", useCdn: false, token }) : sanityClient;
     const [items, total] = await Promise.all([
-      sanityClient.fetch(query, { categoryId, search, offset, end }),
-      sanityClient.fetch(countQuery, { categoryId, search })
+      client.fetch(query, { categoryId, search, offset, end }),
+      client.fetch(countQuery, { categoryId, search })
     ]);
     const hasMore = offset + items.length < total;
     return new Response(JSON.stringify({ items, total, offset, limit, hasMore }), { status: 200, headers: { "Content-Type": "application/json" } });
