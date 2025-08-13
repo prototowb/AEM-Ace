@@ -10,19 +10,24 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   output: 'server',
   adapter: vercel({
-    includeFiles: [
-      'node_modules/vue/**',
-      'node_modules/@vue/**',
-      'node_modules/@astrojs/vue/**'
-    ]
+    functionPerRoute: false,
+    maxDuration: 60
   }),
   vite: {
-    ssr: { noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue'] },
+    ssr: { 
+      noExternal: ['vue', '@vue/server-renderer', '@astrojs/vue']
+    },
+    build: {
+      rollupOptions: {
+        external: ['fsevents']
+      }
+    },
     resolve: {
-      dedupe: ['react', 'react-dom']
+      dedupe: ['react', 'react-dom', 'vue']
     },
     optimizeDeps: {
-      include: ['react', 'react-dom']
+      include: ['react', 'react-dom', 'vue', '@astrojs/vue'],
+      exclude: ['fsevents']
     }
   },
   integrations: [
