@@ -1,4 +1,4 @@
-import { s as sanityClient } from '../../chunks/_sanity_client_BMKYt-fo.mjs';
+import { s as sanityClient } from '../../chunks/sanity_5NUE8U2-.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const prerender = false;

@@ -1,4 +1,4 @@
-import '../chunks/page-ssr_C3OMqKvf.mjs';
+import '../chunks/page-ssr_BXMG_FyV.mjs';
 import { e as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CX0OslVb.mjs';
 import 'kleur/colors';
 import { $ as $$Layout } from '../chunks/Layout_CT3lLmra.mjs';

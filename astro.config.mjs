@@ -9,7 +9,12 @@ import vercel from '@astrojs/vercel';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({
+    includeFiles: [
+      'node_modules/vue/**',
+      'node_modules/@vue/**'
+    ]
+  }),
   vite: {
     resolve: {
       dedupe: ['react', 'react-dom']
