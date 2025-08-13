@@ -5,6 +5,7 @@ export interface Props {
 }
 
 const { title, description = "Master the Adobe AEM Site Developer Professional Exam with interactive quizzes and comprehensive Q&A catalog." } = Astro.props;
+import '../styles/global.css';
 ---
 
 <!doctype html>
@@ -76,8 +77,6 @@ const { title, description = "Master the Adobe AEM Site Developer Professional E
       </div>
     </footer>
 
-    <script>
-      import '../styles/global.css';
-    </script>
+    
   </body>
 </html>

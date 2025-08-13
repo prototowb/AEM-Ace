@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import { sanityClient } from 'sanity:client';
+import { sanityClient } from '../../lib/sanity';
 import { createClient } from '@sanity/client';
 
 // Generate and freeze a curated exam based on votes
