@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="description" content="Master the Adobe AEM Site Developer Professional Exam with interactive quizzes and comprehensive Q&#38;A catalog."><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Q&amp;A Catalog - AEM Ace</title><link rel="stylesheet" href="/_astro/Layout.VahK4Env.css">
-<link rel="stylesheet" href="/_astro/studio-route.Dx2Ofw7r.css"></head> <body> <header class="bg-white shadow-sm border-b border-gray-200"> <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="flex justify-between items-center h-16"> <div class="flex items-center"> <a href="/" class="text-2xl font-heading font-bold text-primary">
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="description" content="Master the Adobe AEM Site Developer Professional Exam with interactive quizzes and comprehensive Q&#38;A catalog."><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Q&amp;A Catalog - AEM Ace</title><link rel="stylesheet" href="/_astro/catalog.DcaHRRsv.css"></head> <body> <header class="bg-white shadow-sm border-b border-gray-200"> <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="flex justify-between items-center h-16"> <div class="flex items-center"> <a href="/" class="text-2xl font-heading font-bold text-primary">
 AEM Ace
 </a> </div> <div class="hidden md:block"> <div class="ml-10 flex items-baseline space-x-4"> <a href="/" class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
 Home
@@ -11,7 +10,7 @@ Submit Question
 Take Quiz
 </a> <a href="/final-exam" class="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
 Final Exam
-</a> </div> </div> <!-- Mobile menu button --> <div class="md:hidden"> <button type="button" class="bg-gray-50 p-2 rounded-md text-gray-900 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"> <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> </nav> </header> <main class="min-h-screen bg-background">  <div class="py-12"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="text-center mb-12"> <h1 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+</a> </div> </div> <!-- Mobile menu button --> <div class="md:hidden"> <button id="mobile-menu-btn" type="button" class="bg-gray-50 p-2 rounded-md text-gray-900 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary" aria-controls="mobile-menu" aria-expanded="false"> <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile menu panel --> <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 py-3"> <div class="flex flex-col space-y-1"> <a href="/" class="block px-3 py-2 text-gray-900 hover:text-primary">Home</a> <a href="/catalog" class="block px-3 py-2 text-gray-900 hover:text-primary">Q&A Catalog</a> <a href="/submit" class="block px-3 py-2 text-gray-900 hover:text-primary">Submit Question</a> <a href="/quiz" class="block px-3 py-2 text-white bg-primary rounded-md mx-3 text-center">Take Quiz</a> <a href="/final-exam" class="block px-3 py-2 text-gray-900 hover:text-primary">Final Exam</a> </div> </div> </nav> </header> <main class="min-h-screen bg-background">  <div class="py-12"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="text-center mb-12"> <h1 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
 Q&A Catalog
 </h1> <p class="text-xl text-gray-600 max-w-2xl mx-auto">
 Browse and study individual Q&A pairs from the AEM Site Developer exam. 
@@ -20,4 +19,14 @@ Browse and study individual Q&A pairs from the AEM Site Developer exam.
 Master the Adobe AEM Site Developer Professional Exam
 </p> <p class="text-gray-400 text-sm">
 Built with Astro, Vue, and Tailwind CSS
-</p> </div> </div> </footer>  </body> </html>
+</p> </div> </div> </footer> <script>
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          const isHidden = menu.classList.contains('hidden');
+          menu.classList.toggle('hidden');
+          btn.setAttribute('aria-expanded', String(isHidden));
+        }, { passive: true });
+      }
+    </script> </body> </html>

@@ -1,8 +1,8 @@
-import '../chunks/page-ssr_BXMG_FyV.mjs';
-import { e as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CX0OslVb.mjs';
+/* empty css                                   */
+import { e as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CfiTzbZJ.mjs';
 import 'kleur/colors';
-import { $ as $$Layout } from '../chunks/Layout_CT3lLmra.mjs';
-export { renderers } from '../renderers.mjs';
+import { $ as $$Layout } from '../chunks/Layout_C6GLU_8r.mjs';
+export { r as renderers } from '../chunks/_@astro-renderers_wXmDkZlw.mjs';
 
 const $$404 = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Page Not Found - AEM Ace" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<div class="py-24"> <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"> <h1 class="text-6xl font-heading font-bold text-primary mb-4">404</h1> <h2 class="text-3xl font-heading font-semibold mb-6">Page Not Found</h2> <p class="text-xl text-gray-600 mb-8">

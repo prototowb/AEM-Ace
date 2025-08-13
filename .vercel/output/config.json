@@ -24,10 +24,6 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^/admin(?:/(.*?))?/?$",
-			"dest": "_render"
-		},
-		{
 			"src": "^/api/generate-final-exam/?$",
 			"dest": "_render"
 		},
@@ -41,10 +37,6 @@
 		},
 		{
 			"src": "^/api/submit-vote/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/final-exam/?$",
 			"dest": "_render"
 		},
 		{
