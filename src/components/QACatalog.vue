@@ -93,6 +93,32 @@
           </span>
         </div>
 
+        <!-- Voting -->
+        <div class="mb-4 flex items-center gap-3">
+          <button
+            class="inline-flex items-center justify-center rounded-md border px-2 py-1 text-sm transition-colors"
+            :class="userVotes[question._id] === 1 ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+            @click="onVoteClick(question, 1)"
+            aria-label="Upvote"
+          >
+            ▲
+          </button>
+          <span class="min-w-[3rem] text-center font-medium" :class="(question.voteScore || 0) >= 0 ? 'text-gray-900' : 'text-gray-700'">
+            {{ question.voteScore ?? 0 }}
+          </span>
+          <button
+            class="inline-flex items-center justify-center rounded-md border px-2 py-1 text-sm transition-colors"
+            :class="userVotes[question._id] === -1 ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+            @click="onVoteClick(question, -1)"
+            aria-label="Downvote"
+          >
+            ▼
+          </button>
+          <span class="ml-2 text-xs text-gray-500">
+            {{ question.upvotes ?? 0 }} up • {{ question.downvotes ?? 0 }} down
+          </span>
+        </div>
+
         <div class="mb-4">
           <p class="text-gray-700 mb-4">{{ question.question }}</p>
           
@@ -131,24 +157,31 @@
       </div>
 
       <!-- No Results -->
-      <div v-if="filteredQuestions.length === 0" class="text-center py-12">
+      <div v-if="!isLoading && filteredQuestions.length === 0" class="text-center py-12">
         <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
         </svg>
         <h3 class="text-lg font-medium text-gray-900 mb-2">No Questions Found</h3>
         <p class="text-gray-600">Try adjusting your search or filter criteria.</p>
       </div>
+      
+      <div v-if="isLoading" class="text-center py-6 text-gray-500">Loading...</div>
+      
+      <div class="text-center mt-4" v-if="hasMore && !isLoading">
+        <button @click="loadMore" class="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 hover:bg-gray-50">
+          Load more
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import type { Question, Category } from '../lib/sanity';
 
 // Props from parent component
 interface Props {
-  questions: Question[];
   categories: Category[];
 }
 
@@ -156,9 +189,88 @@ const props = defineProps<Props>();
 
 const selectedCategory = ref<string | null>(null);
 const searchQuery = ref('');
+const questions = ref<Question[]>([]);
+const offset = ref(0);
+const limit = 5;
+const hasMore = ref(true);
+const isLoading = ref(false);
+const userVotes = ref<Record<string, 1 | -1 | 0>>({});
+const sessionId = ref<string>('');
+
+function loadStoredVotes() {
+  try {
+    const raw = localStorage.getItem('aemace.votes');
+    userVotes.value = raw ? JSON.parse(raw) : {};
+  } catch {
+    userVotes.value = {};
+  }
+}
+
+function persistVotes() {
+  try {
+    localStorage.setItem('aemace.votes', JSON.stringify(userVotes.value));
+  } catch {}
+}
+
+function getOrCreateSessionId(): string {
+  try {
+    const stored = localStorage.getItem('aemace.sessionId');
+    if (stored) return stored;
+    const sid = (globalThis as any).crypto?.randomUUID?.() || `sess_${Math.random().toString(36).slice(2)}${Date.now()}`;
+    localStorage.setItem('aemace.sessionId', sid);
+    return sid;
+  } catch {
+    return `sess_${Date.now()}`;
+  }
+}
+
+onMounted(() => {
+  loadStoredVotes();
+  sessionId.value = getOrCreateSessionId();
+});
+
+async function onVoteClick(question: Question, targetValue: 1 | -1) {
+  const current = userVotes.value[question._id] || 0;
+  const next: 1 | -1 | 0 = current === targetValue ? 0 : targetValue;
+
+  // Optimistic update
+  applyVoteLocally(question, current, next);
+  userVotes.value[question._id] = next;
+  persistVotes();
+
+  try {
+    const res = await fetch('/api/submit-vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questionId: question._id, value: next, sessionId: sessionId.value })
+    });
+    if (!res.ok) throw new Error('Vote failed');
+  } catch {
+    // Revert on failure
+    applyVoteLocally(question, next, current);
+    userVotes.value[question._id] = current;
+    persistVotes();
+  }
+}
+
+function applyVoteLocally(question: Question, prev: 1 | -1 | 0, next: 1 | -1 | 0) {
+  const up = question.upvotes ?? 0;
+  const down = question.downvotes ?? 0;
+  let newUp = up;
+  let newDown = down;
+
+  if (prev === 1) newUp -= 1;
+  if (prev === -1) newDown -= 1;
+  if (next === 1) newUp += 1;
+  if (next === -1) newDown += 1;
+
+  question.upvotes = Math.max(0, newUp);
+  question.downvotes = Math.max(0, newDown);
+  question.voteScore = (question.upvotes || 0) - (question.downvotes || 0);
+}
 
 const filteredQuestions = computed(() => {
-  let filtered = props.questions;
+  let filtered = questions.value;
   
   if (selectedCategory.value) {
     filtered = filtered.filter(q => q.category._id === selectedCategory.value);
@@ -176,5 +288,37 @@ const filteredQuestions = computed(() => {
   return filtered;
 });
 
-// No need for loadQuestions anymore since data comes from props
+async function fetchQuestions(reset = false) {
+  if (isLoading.value) return;
+  isLoading.value = true;
+  try {
+    const params = new URLSearchParams();
+    params.set('offset', String(reset ? 0 : offset.value));
+    params.set('limit', String(limit));
+    if (selectedCategory.value) params.set('categoryId', selectedCategory.value);
+    if (searchQuery.value.trim()) params.set('search', searchQuery.value.trim());
+    const res = await fetch(`/api/questions?${params.toString()}`);
+    const data = await res.json();
+    if (reset) questions.value = [];
+    questions.value = [...questions.value, ...data.items];
+    offset.value = (reset ? 0 : offset.value) + data.items.length;
+    hasMore.value = Boolean(data.hasMore);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function loadMore() {
+  fetchQuestions(false);
+}
+
+watch([selectedCategory, searchQuery], () => {
+  offset.value = 0;
+  hasMore.value = true;
+  fetchQuestions(true);
+});
+
+onMounted(() => {
+  fetchQuestions(true);
+});
 </script>

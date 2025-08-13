@@ -117,6 +117,38 @@ export const questionSchema = {
   ]
 };
 
+// Submissions for moderation
+export const questionSubmissionSchema = {
+  name: 'questionSubmission',
+  title: 'Question Submission',
+  type: 'document',
+  fields: [
+    { name: 'title', title: 'Title', type: 'string', validation: Rule => Rule.required() },
+    { name: 'question', title: 'Question', type: 'text', validation: Rule => Rule.required() },
+    { name: 'options', title: 'Options', type: 'array', of: [{ type: 'string' }], validation: Rule => Rule.required().min(2).max(6) },
+    { name: 'correctAnswers', title: 'Correct Answer Indices', type: 'array', of: [{ type: 'number' }], validation: Rule => Rule.required().min(1) },
+    { name: 'isMultipleChoice', title: 'Multiple Correct Answers', type: 'boolean', initialValue: false },
+    { name: 'explanation', title: 'Explanation', type: 'text' },
+    { name: 'category', title: 'Category', type: 'reference', to: [{ type: 'category' }], validation: Rule => Rule.required() },
+    { name: 'difficulty', title: 'Difficulty', type: 'string', options: { list: [
+      { title: 'Beginner', value: 'beginner' },
+      { title: 'Intermediate', value: 'intermediate' },
+      { title: 'Advanced', value: 'advanced' }
+    ]}, validation: Rule => Rule.required() },
+    { name: 'tags', title: 'Tags', type: 'array', of: [{ type: 'string' }] },
+    { name: 'submitter', title: 'Submitter', type: 'object', fields: [
+      { name: 'name', title: 'Name', type: 'string' },
+      { name: 'email', title: 'Email', type: 'string' }
+    ]},
+    { name: 'status', title: 'Status', type: 'string', options: { list: [
+      { title: 'Pending', value: 'pending' },
+      { title: 'Approved', value: 'approved' },
+      { title: 'Rejected', value: 'rejected' }
+    ]}, initialValue: 'pending' },
+    { name: 'submittedAt', title: 'Submitted At', type: 'datetime' }
+  ]
+};
+
 export const blogPostSchema = {
   name: 'post',
   title: 'Blog Post',
@@ -185,5 +217,70 @@ export const blogPostSchema = {
   ]
 };
 
+// Track per-question votes by anonymous session
+export const voteSchema = {
+  name: 'vote',
+  title: 'Question Vote',
+  type: 'document',
+  fields: [
+    {
+      name: 'question',
+      title: 'Question',
+      type: 'reference',
+      to: [{ type: 'question' }],
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'sessionId',
+      title: 'Session ID',
+      type: 'string',
+      description: 'Anonymous session identifier used to prevent duplicate voting',
+      validation: Rule => Rule.required().min(10)
+    },
+    {
+      name: 'value',
+      title: 'Value',
+      type: 'number',
+      description: 'Vote value: +1 for upvote, -1 for downvote',
+      validation: Rule => Rule.required().min(-1).max(1)
+    },
+    {
+      name: 'createdAt',
+      title: 'Created At',
+      type: 'datetime',
+      initialValue: () => new Date().toISOString()
+    }
+  ]
+};
+
+// Stored, frozen exam papers generated from curated pool
+export const finalExamPaperSchema = {
+  name: 'finalExamPaper',
+  title: 'Final Exam Paper',
+  type: 'document',
+  fields: [
+    { name: 'title', title: 'Title', type: 'string' },
+    {
+      name: 'questions',
+      title: 'Questions',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'question' }] }],
+      validation: Rule => Rule.required().min(1)
+    },
+    { name: 'generatedAt', title: 'Generated At', type: 'datetime' },
+    {
+      name: 'criteria',
+      title: 'Criteria',
+      type: 'object',
+      fields: [
+        { name: 'size', title: 'Size', type: 'number' },
+        { name: 'minVotes', title: 'Min Votes', type: 'number' },
+        { name: 'minRatio', title: 'Min Upvote Ratio', type: 'number' },
+        { name: 'balanced', title: 'Balanced By Category', type: 'boolean' }
+      ]
+    }
+  ]
+};
+
 // Export all schemas
-export const schemas = [categorySchema, questionSchema, blogPostSchema];
+export const schemas = [categorySchema, questionSchema, blogPostSchema, questionSubmissionSchema, voteSchema, finalExamPaperSchema];

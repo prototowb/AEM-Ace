@@ -1,21 +1,33 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
+import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static', // Static site generation
+  output: 'server',
+  adapter: vercel(),
+  vite: {
+    resolve: {
+      dedupe: ['react', 'react-dom']
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom']
+    }
+  },
   integrations: [
-    vue(), 
+    vue(),
+    react(),
     tailwind(),
     sanity({
       projectId: 'z5tty2va',
       dataset: 'production',
       useCdn: true, // Use CDN for production builds
-      // Remove studio for static builds
-      // studioBasePath: '/admin',
+      // Mount Sanity Studio at /admin (built as static assets)
+      studioBasePath: '/admin',
     })
   ]
 });

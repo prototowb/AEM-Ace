@@ -7,6 +7,8 @@
           Choose Your Quiz Settings
         </h2>
         
+        
+
         <!-- Category Selection -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-3">
@@ -293,7 +295,9 @@ interface Props {
   categories: Category[];
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  questions: () => [],
+});
 
 // Quiz state
 const isQuizStarted = ref(false);
@@ -312,6 +316,7 @@ const numberOfQuestions = ref(10);
 // Data
 const quizQuestions = ref<Question[]>([]);
 const loading = ref(false);
+// final exam functionality removed; handled on a separate page
 
 // No sample data needed - using props
 
@@ -342,21 +347,37 @@ const averageTime = computed(() =>
 // Methods
 const startQuiz = async () => {
   loading.value = true;
-  
-  // Filter questions based on settings
-  let filteredQuestions = [...props.questions];
-  
+  // Build pool of questions
+  let pool: Question[] = [];
+  if (props.questions && props.questions.length > 0) {
+    pool = [...props.questions];
+  } else {
+    // Fetch from API when not provided
+    try {
+      const params = new URLSearchParams();
+      params.set('limit', '50');
+      if (selectedCategory.value) params.set('categoryId', selectedCategory.value);
+      const res = await fetch(`/api/questions?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        pool = Array.isArray(data?.items) ? data.items : [];
+      }
+    } catch {
+      // ignore and fall through with empty pool
+    }
+  }
+
+  // Apply filters
   if (selectedCategory.value) {
-    filteredQuestions = filteredQuestions.filter(q => q.category._id === selectedCategory.value);
+    pool = pool.filter(q => q.category._id === selectedCategory.value);
   }
-  
   if (selectedDifficulty.value) {
-    filteredQuestions = filteredQuestions.filter(q => q.difficulty === selectedDifficulty.value);
+    pool = pool.filter(q => q.difficulty === selectedDifficulty.value);
   }
-  
+
   // Shuffle and take requested number of questions
-  const shuffled = filteredQuestions.sort(() => Math.random() - 0.5);
-  quizQuestions.value = shuffled.slice(0, Math.min(numberOfQuestions.value, shuffled.length));
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  quizQuestions.value = shuffled.slice(0, Math.min(Number(numberOfQuestions.value), shuffled.length));
   
   if (quizQuestions.value.length === 0) {
     alert('No questions available for the selected criteria. Please try different settings.');
@@ -375,6 +396,8 @@ const startQuiz = async () => {
   
   loading.value = false;
 };
+
+// startFinalExam removed
 
 const toggleAnswer = (answerIndex: number) => {
   if (isAnswered.value) return;
