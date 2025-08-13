@@ -12,7 +12,8 @@ export default defineConfig({
   adapter: vercel({
     includeFiles: [
       'node_modules/vue/**',
-      'node_modules/@vue/**'
+      'node_modules/@vue/**',
+      'node_modules/@astrojs/vue/**'
     ]
   }),
   vite: {
