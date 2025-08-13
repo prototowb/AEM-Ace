@@ -44,9 +44,11 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
-    const token = process.env.SANITY_WRITE_TOKEN;
+    const token =
+      process.env.SANITY_CONTRIBUTER_TOKEN ||
+      process.env.SANITY_EDITOR_TOKEN;
     if (!token) {
-      console.error('Missing SANITY_WRITE_TOKEN');
+      console.error('Missing Sanity token for question submission');
       res.status(500).json({ message: 'Server misconfiguration' });
       return;
     }
@@ -59,12 +61,14 @@ export default async function handler(req: any, res: any) {
       apiVersion: '2024-10-01'
     });
 
+    const normalizedCorrectAnswers = Array.from(new Set(correctAnswers as number[])).sort((a, b) => (a as number) - (b as number)) as number[];
+
     const doc = {
       _type: 'questionSubmission',
       title: title.trim(),
       question: question.trim(),
       options: options.map((o: string) => o.trim()),
-      correctAnswers: Array.from(new Set(correctAnswers)).sort((a: number, b: number) => a - b),
+      correctAnswers: normalizedCorrectAnswers,
       isMultipleChoice: Array.isArray(correctAnswers) && correctAnswers.length > 1,
       explanation: explanation ? String(explanation).trim() : undefined,
       category: { _type: 'reference', _ref: categoryId },

@@ -28,6 +28,9 @@ export interface Question {
   };
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   tags?: string[];
+  voteScore?: number;
+  upvotes?: number;
+  downvotes?: number;
 }
 
 export interface Category {
@@ -76,7 +79,10 @@ export const queries = {
       color
     },
     difficulty,
-    tags
+    tags,
+    "upvotes": count(*[_type == 'vote' && value == 1 && references(^._id)]),
+    "downvotes": count(*[_type == 'vote' && value == -1 && references(^._id)]),
+    "voteScore": count(*[_type == 'vote' && value == 1 && references(^._id)]) - count(*[_type == 'vote' && value == -1 && references(^._id)])
   }`,
   
   questionsByCategory: `*[_type == "question" && category._ref == $categoryId] | order(_createdAt desc) {
@@ -88,7 +94,10 @@ export const queries = {
     isMultipleChoice,
     explanation,
     difficulty,
-    tags
+    tags,
+    "upvotes": count(*[_type == 'vote' && value == 1 && references(^._id)]),
+    "downvotes": count(*[_type == 'vote' && value == -1 && references(^._id)]),
+    "voteScore": count(*[_type == 'vote' && value == 1 && references(^._id)]) - count(*[_type == 'vote' && value == -1 && references(^._id)])
   }`,
   
   allCategories: `*[_type == "category"] | order(name asc) {
