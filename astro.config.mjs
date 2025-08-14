@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
-// import sanity from '@sanity/astro';
+import sanity from '@sanity/astro';
 import vercel from '@astrojs/vercel';
 
 // Check if we're building for production (Vercel)
@@ -55,11 +55,12 @@ export default defineConfig({
     vue(),
     react(),
     tailwind(),
-    // sanity({
-    //   projectId: 'z5tty2va',
-    //   dataset: 'production',
-    //   useCdn: true,
-    //   studioBasePath: '/admin',
-    // })
+    sanity({
+      projectId: 'z5tty2va',
+      dataset: 'production',
+      useCdn: true,
+      // Mount Sanity Studio at /admin (built as static assets)
+      studioBasePath: '/admin',
+    })
   ]
 });
