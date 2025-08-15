@@ -4,15 +4,21 @@ import vue from '@astrojs/vue';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
-import sanity from '@sanity/astro';
 import vercel from '@astrojs/vercel';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env.local (only in development)
+if (!process.env.VERCEL) {
+  dotenv.config({ path: '.env.local' });
+}
 
 // Check if we're building for production (Vercel)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
 
 // Enable Sanity Studio only when explicitly requested
 const enableStudio = process.env.ENABLE_SANITY_STUDIO === 'true';
+console.log('Studio enabled:', enableStudio); // Debug log
 
 // https://astro.build/config
 export default defineConfig({
