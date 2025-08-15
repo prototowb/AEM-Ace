@@ -59,19 +59,59 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 
 ## 🚀 Deployment to Vercel
 
-1. **Push to GitHub**: Commit and push your changes to your GitHub repository
+### Prerequisites
+- GitHub repository with your code
+- Vercel account (free tier works)
+- Sanity tokens from [manage.sanity.io](https://manage.sanity.io)
 
-2. **Connect to Vercel**:
-   - Go to [vercel.com](https://vercel.com)
+### Environment Variables Required
+
+Add these in Vercel Dashboard → Settings → Environment Variables:
+
+```bash
+# Required for API functionality
+SANITY_CONTRIBUTER_TOKEN=sk...  # For question submissions
+SANITY_EDITOR_TOKEN=sk...       # For voting and exam generation
+
+# Optional - Enable Sanity Studio at /admin
+ENABLE_SANITY_STUDIO=true       # Set to 'false' to disable Studio
+```
+
+### Deployment Steps
+
+1. **Push to GitHub**: 
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Import to Vercel**:
+   - Go to [vercel.com/new](https://vercel.com/new)
    - Import your GitHub repository
-   - Vercel will automatically detect the Astro framework
+   - Vercel auto-detects Astro framework
 
-3. **Configure Environment Variables** (if needed):
-   - Add any Sanity environment variables in Vercel dashboard
+3. **Configure Environment Variables**:
+   - Add the variables listed above
+   - Select appropriate environments (Production/Preview/Development)
 
-4. **Deploy**: Vercel will automatically build and deploy your site
+4. **Deploy**: Click Deploy and wait for build to complete
 
-The site will be available at `https://your-project-name.vercel.app`
+5. **Configure CORS** (for Studio):
+   - Visit `https://your-app.vercel.app/admin`
+   - Authorize the domain when prompted
+
+### Continuous Deployment
+- **Production**: Every push to `main` branch auto-deploys
+- **Preview**: Every PR gets a unique preview URL
+- **Rollback**: Available via Vercel dashboard
+
+### Troubleshooting
+- **Studio 404**: Ensure `ENABLE_SANITY_STUDIO=true` is set and redeploy
+- **API Errors**: Verify tokens are correctly set with proper permissions
+- **Build Failures**: Check build logs in Vercel dashboard
+
+For detailed deployment guide, see [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 
 ## 🔧 Setup
 

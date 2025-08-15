@@ -8,13 +8,14 @@ Yo buddy! This is your comprehensive guide for collaborating with Claude on the 
 Help developers ace their AEM certification through interactive quizzes and comprehensive Q&A catalogs. We're talking about a modern, responsive platform that doesn't just test knowledge - it builds it.
 
 ### 🛠️ Tech Stack Overview
-- **Frontend Framework**: Astro (Static Site Generator)
+- **Frontend Framework**: Astro (SSR/SSG Hybrid)
 - **Interactive Components**: Vue.js 3 with Composition API
 - **Type Safety**: TypeScript (because we're not animals)
 - **Styling**: Tailwind CSS with custom design system
-- **Content Management**: Sanity.io CMS
-- **Deployment**: Vercel (auto-deploy from main branch)
+- **Content Management**: Sanity.io CMS with embedded Studio
+- **Deployment**: Vercel with serverless functions
 - **Package Manager**: npm
+- **API Routes**: Astro server endpoints for voting & submissions
 
 ---
 
@@ -173,11 +174,15 @@ Custom utilities defined in `tailwind.config.mjs` for:
 - Content types: Questions, Categories, Multiple Answers
 
 ### Deployment Pipeline
-- **Trigger**: Push to main branch
-- **Platform**: Vercel (auto-detected Astro project)
-- **Build**: `npm run build`
-- **Output**: Static files to `/dist/`
-- **Environment Variables**: Configured in Vercel dashboard
+- **Trigger**: Push to main branch (auto-deploy)
+- **Platform**: Vercel with @astrojs/vercel adapter
+- **Build**: `npm run build` (SSR mode)
+- **Output**: Serverless functions + static assets
+- **Environment Variables**: 
+  - `SANITY_CONTRIBUTER_TOKEN`: For question submissions
+  - `SANITY_EDITOR_TOKEN`: For voting and exam generation
+  - `ENABLE_SANITY_STUDIO`: Toggle Studio at /admin
+- **CORS**: Configure at manage.sanity.io for Studio access
 
 ---
 
@@ -252,6 +257,41 @@ try {
   console.error('Failed to fetch questions:', error)
   return []
 }
+```
+
+### Deployment Gotchas & Fixes
+
+#### Module Not Found / .node Loader Errors
+```javascript
+// astro.config.mjs - Prevent bundling native modules
+vite: {
+  ssr: {
+    external: ['fsevents', 'chokidar']
+  },
+  optimizeDeps: {
+    exclude: ['fsevents', 'chokidar']
+  }
+}
+```
+
+#### Sanity Studio 404 in Production
+```bash
+# Enable Studio via environment variable
+ENABLE_SANITY_STUDIO=true
+
+# Conditional loading in astro.config.mjs
+const enableStudio = process.env.ENABLE_SANITY_STUDIO === 'true';
+```
+
+#### Git Secret Leaks Prevention
+```bash
+# Never track .env files
+.env
+.env.local
+.env.*.local
+
+# Use .env.example for templates
+cp .env.example .env.local
 ```
 
 ---
