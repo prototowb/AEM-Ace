@@ -3,11 +3,14 @@ import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
-// import sanity from '@sanity/astro';
+import sanity from '@sanity/astro';
 import vercel from '@astrojs/vercel';
 
 // Check if we're building for production (Vercel)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+
+// Enable Sanity Studio only when explicitly requested
+const enableStudio = process.env.ENABLE_SANITY_STUDIO === 'true';
 
 // https://astro.build/config
 export default defineConfig({
@@ -21,9 +24,7 @@ export default defineConfig({
     }
   }) : undefined,
   vite: {
-    ssr: { 
-      noExternal: true  // Bundle everything for SSR
-    },
+    ssr: {},
     resolve: {
       dedupe: ['react', 'react-dom', 'vue']
     },
@@ -55,11 +56,14 @@ export default defineConfig({
     vue(),
     react(),
     tailwind(),
-    // sanity({
-    //   projectId: 'z5tty2va',
-    //   dataset: 'production',
-    //   useCdn: true,
-    //   studioBasePath: '/admin',
-    // })
+    // Conditionally include Sanity Studio integration
+    ...(enableStudio ? [
+      sanity({
+        projectId: 'z5tty2va',
+        dataset: 'production',
+        useCdn: true,
+        studioBasePath: '/admin',
+      })
+    ] : [])
   ]
 });
