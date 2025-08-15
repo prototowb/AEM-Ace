@@ -5,6 +5,7 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sanity from '@sanity/astro';
 import vercel from '@astrojs/vercel';
+import { fileURLToPath } from 'node:url';
 
 // Check if we're building for production (Vercel)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
@@ -21,11 +22,16 @@ export default defineConfig({
     }
   }) : undefined,
   vite: {
-    ssr: { 
-      noExternal: true  // Bundle everything for SSR
+    ssr: {
+      // Ensure native/optional deps are never bundled in SSR
+      external: ['fsevents', 'chokidar']
     },
     resolve: {
-      dedupe: ['react', 'react-dom', 'vue']
+      dedupe: ['react', 'react-dom', 'vue'],
+      alias: {
+        // Avoid resolving native optional dep
+        fsevents: fileURLToPath(new URL('./stubs/empty.js', import.meta.url))
+      }
     },
     optimizeDeps: {
       include: [
@@ -43,7 +49,7 @@ export default defineConfig({
         '@vue/shared',
         '@astrojs/vue'
       ],
-      exclude: ['fsevents']
+      exclude: ['fsevents', 'chokidar']
     },
     build: {
       rollupOptions: {
