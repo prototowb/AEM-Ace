@@ -7,10 +7,11 @@ A comprehensive quiz platform and Q&A catalog to help developers ace the Adobe A
 - **Interactive Quiz**: Multiple-choice quizzes with automatic scoring and instant feedback
 - **Q&A Catalog**: Browse and study comprehensive question pools organized by categories
 - **Voting & Curation**: Upvote/downvote questions to surface quality content and build a curated exam pool
-- **Final Exam Mode**: Generate and take a curated “final exam” based on community votes
+- **Final Exam Mode**: Generate and take a curated "final exam" based on community votes
 - **Multiple Answer Support**: Handle both single and multiple correct answer questions
 - **Responsive Design**: Beautiful, modern UI that works on all devices
 - **Content Management**: Powered by Sanity CMS for easy content updates
+- **Analytics**: Integrated Vercel Analytics for visitor tracking and insights
 
 ## 🛠️ Tech Stack
 
