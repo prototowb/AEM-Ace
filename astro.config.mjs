@@ -28,7 +28,7 @@ export default defineConfig({
     functionPerRoute: false,
     maxDuration: 60,
     webAnalytics: {
-      enabled: false
+      enabled: true
     }
   }) : undefined,
   vite: {
