@@ -26,10 +26,7 @@ export default defineConfig({
   // Only use adapter for production builds
   adapter: isProduction ? vercel({
     functionPerRoute: false,
-    maxDuration: 60,
-    webAnalytics: {
-      enabled: true
-    }
+    maxDuration: 60
   }) : undefined,
   vite: {
     ssr: {},
