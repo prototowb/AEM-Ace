@@ -17,6 +17,8 @@ import Analytics from '@vercel/analytics/astro';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <!-- Vercel Analytics Component -->
+    <Analytics />
   </head>
   <body>
     <header class="bg-white shadow-sm border-b border-gray-200">
@@ -99,8 +101,5 @@ import Analytics from '@vercel/analytics/astro';
         }, { passive: true });
       }
     </script>
-    
-    <!-- Vercel Analytics Component -->
-    <Analytics client:load />
   </body>
 </html>
