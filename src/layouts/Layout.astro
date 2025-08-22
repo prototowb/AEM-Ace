@@ -6,7 +6,6 @@ export interface Props {
 
 const { title, description = "Master the Adobe AEM Site Developer Professional Exam with interactive quizzes and comprehensive Q&A catalog." } = Astro.props;
 import '../styles/global.css';
-import Analytics from '@vercel/analytics/astro';
 ---
 
 <!doctype html>
@@ -17,7 +16,6 @@ import Analytics from '@vercel/analytics/astro';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-    <Analytics debug={true} />
   </head>
   <body>
     <header class="bg-white shadow-sm border-b border-gray-200">
@@ -100,5 +98,11 @@ import Analytics from '@vercel/analytics/astro';
         }, { passive: true });
       }
     </script>
+    
+    <!-- Vercel Web Analytics -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>
