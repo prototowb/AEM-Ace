@@ -6,10 +6,6 @@ export interface Props {
 
 const { title, description = "Master the Adobe AEM Site Developer Professional Exam with interactive quizzes and comprehensive Q&A catalog." } = Astro.props;
 import '../styles/global.css';
-import Analytics from '@vercel/analytics/astro';
-
-// Check if we're building for production (Vercel)
-const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
 ---
 
 <!doctype html>
@@ -20,8 +16,6 @@ const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-    <!-- Vercel Analytics Component -->
-    <Analytics mode={isProduction ? "production" : "development"} />
   </head>
   <body>
     <header class="bg-white shadow-sm border-b border-gray-200">
@@ -103,6 +97,18 @@ const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL
           btn.setAttribute('aria-expanded', String(isHidden));
         }, { passive: true });
       }
+    </script>
+    
+    <!-- Vercel Analytics -->
+    <script>
+      import { inject } from '@vercel/analytics';
+      
+      // Inject analytics with mode based on environment
+      // In production (Vercel), this will track real users
+      // In development, it won't send data but allows testing
+      inject({ 
+        mode: import.meta.env.PROD ? 'production' : 'development' 
+      });
     </script>
   </body>
 </html>
